@@ -66,6 +66,12 @@ map("n", "<leader>th", function()
   require("nvchad.themes").open()
 end, { desc = "telescope nvchad themes" })
 
+map("n", "<leader>tt", function()
+  if #require("chadrc").base46.theme_toggle == 2 then
+    require("base46").toggle_theme()
+  end
+end, { desc = "Toggle Theme" })
+
 map("n", "<leader>ff", "<cmd>Telescope find_files<cr>", { desc = "telescope find files" })
 map(
   "n",
