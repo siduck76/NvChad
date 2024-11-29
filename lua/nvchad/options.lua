@@ -49,6 +49,13 @@ g.loaded_python3_provider = 0
 g.loaded_perl_provider = 0
 g.loaded_ruby_provider = 0
 
+-- UFO folding
+o.foldcolumn = "1"
+o.foldlevel = 99
+o.foldlevelstart = 99
+o.foldenable = true
+o.fillchars = [[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
+
 -- add binaries installed by mason.nvim to path
 local is_windows = vim.fn.has "win32" ~= 0
 local sep = is_windows and "\\" or "/"
