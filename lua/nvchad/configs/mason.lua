@@ -1,5 +1,7 @@
+ -- Load cached configuration for Mason
 dofile(vim.g.base46_cache .. "mason")
 
+-- Return Mason configuration
 return {
   PATH = "skip",
 
@@ -13,3 +15,4 @@ return {
 
   max_concurrent_installers = 10,
 }
+
