@@ -1,16 +1,21 @@
+ -- Load cached configuration for cmp (completion)
 dofile(vim.g.base46_cache .. "cmp")
 
 local cmp = require "cmp"
+local luasnip = require "luasnip"
 
 local options = {
+  -- Completion settings
   completion = { completeopt = "menu,menuone" },
 
+  -- Snippet settings
   snippet = {
     expand = function(args)
-      require("luasnip").lsp_expand(args.body)
+      luasnip.lsp_expand(args.body)
     end,
   },
 
+  -- Key mappings for cmp
   mapping = {
     ["<C-p>"] = cmp.mapping.select_prev_item(),
     ["<C-n>"] = cmp.mapping.select_next_item(),
@@ -27,8 +32,8 @@ local options = {
     ["<Tab>"] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
-      elseif require("luasnip").expand_or_jumpable() then
-        require("luasnip").expand_or_jump()
+      elseif luasnip.expand_or_jumpable() then
+        luasnip.expand_or_jump()
       else
         fallback()
       end
@@ -37,21 +42,24 @@ local options = {
     ["<S-Tab>"] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_prev_item()
-      elseif require("luasnip").jumpable(-1) then
-        require("luasnip").jump(-1)
+      elseif luasnip.jumpable(-1) then
+        luasnip.jump(-1)
       else
         fallback()
       end
     end, { "i", "s" }),
   },
 
-  sources = {
+  -- Completion sources
+  sources = cmp.config.sources({
     { name = "nvim_lsp" },
     { name = "luasnip" },
     { name = "buffer" },
     { name = "nvim_lua" },
     { name = "path" },
-  },
+  }),
 }
 
+-- Merge options with NvChad's default cmp configuration
 return vim.tbl_deep_extend("force", options, require "nvchad.cmp")
+
