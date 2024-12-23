@@ -1,39 +1,43 @@
-local M = {}
+ local M = {}
 local map = vim.keymap.set
 
--- export on_attach & capabilities
+-- Export on_attach and capabilities
 M.on_attach = function(_, bufnr)
   local function opts(desc)
     return { buffer = bufnr, desc = "LSP " .. desc }
   end
 
-  map("n", "gD", vim.lsp.buf.declaration, opts "Go to declaration")
-  map("n", "gd", vim.lsp.buf.definition, opts "Go to definition")
-  map("n", "gi", vim.lsp.buf.implementation, opts "Go to implementation")
-  map("n", "<leader>sh", vim.lsp.buf.signature_help, opts "Show signature help")
-  map("n", "<leader>wa", vim.lsp.buf.add_workspace_folder, opts "Add workspace folder")
-  map("n", "<leader>wr", vim.lsp.buf.remove_workspace_folder, opts "Remove workspace folder")
+  -- Key mappings for LSP functionality
+  local mappings = {
+    { "n", "gD", vim.lsp.buf.declaration, "Go to declaration" },
+    { "n", "gd", vim.lsp.buf.definition, "Go to definition" },
+    { "n", "gi", vim.lsp.buf.implementation, "Go to implementation" },
+    { "n", "<leader>sh", vim.lsp.buf.signature_help, "Show signature help" },
+    { "n", "<leader>wa", vim.lsp.buf.add_workspace_folder, "Add workspace folder" },
+    { "n", "<leader>wr", vim.lsp.buf.remove_workspace_folder, "Remove workspace folder" },
+    { "n", "<leader>wl", function()
+        print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+      end, "List workspace folders" },
+    { "n", "<leader>D", vim.lsp.buf.type_definition, "Go to type definition" },
+    { "n", "<leader>ra", require "nvchad.lsp.renamer", "NvRenamer" },
+    { { "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, "Code action" },
+    { "n", "gr", vim.lsp.buf.references, "Show references" },
+  }
 
-  map("n", "<leader>wl", function()
-    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-  end, opts "List workspace folders")
-
-  map("n", "<leader>D", vim.lsp.buf.type_definition, opts "Go to type definition")
-  map("n", "<leader>ra", require "nvchad.lsp.renamer", opts "NvRenamer")
-
-  map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts "Code action")
-  map("n", "gr", vim.lsp.buf.references, opts "Show references")
+  for _, map_args in ipairs(mappings) do
+    map(unpack(map_args), opts(map_args[4]))
+  end
 end
 
--- disable semanticTokens
+-- Disable semantic tokens
 M.on_init = function(client, _)
   if client.supports_method "textDocument/semanticTokens" then
     client.server_capabilities.semanticTokensProvider = nil
   end
 end
 
+-- LSP client capabilities
 M.capabilities = vim.lsp.protocol.make_client_capabilities()
-
 M.capabilities.textDocument.completion.completionItem = {
   documentationFormat = { "markdown", "plaintext" },
   snippetSupport = true,
@@ -52,6 +56,7 @@ M.capabilities.textDocument.completion.completionItem = {
   },
 }
 
+-- Default LSP setup
 M.defaults = function()
   dofile(vim.g.base46_cache .. "lsp")
   require("nvchad.lsp").diagnostic_config()
@@ -60,7 +65,6 @@ M.defaults = function()
     on_attach = M.on_attach,
     capabilities = M.capabilities,
     on_init = M.on_init,
-
     settings = {
       Lua = {
         diagnostics = {
